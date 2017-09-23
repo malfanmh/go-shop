@@ -61,6 +61,7 @@ func (e *errorData) ToString() string {
 }
 
 func RenderJSON(ctx context.Context, i interface{},code int){
-	ctx.JSON(i)
 	ctx.StatusCode(code)
+	ctx.JSON(i)
+	return
 }

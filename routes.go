@@ -23,9 +23,10 @@ func newApp() *iris.Application {
 
 	coupon := r.Party("/v1/api/coupons",)
 	{
-		coupon.Post("/",ping)
-		coupon.Put("/{id}",ping)
-		coupon.Get("/",ping)
+		coupon.Post("/",c.NewCoupon)
+		coupon.Put("/{id}",c.UpdateCoupon)
+		coupon.Get("/",c.GetCoupon)
+		coupon.Get("/{code}",c.GetCouponByCode)
 	}
 
 	order := r.Party("/v1/api/order",)
@@ -46,7 +47,7 @@ func ping(ctx context.Context) {
 
 func notFoundHandler(ctx context.Context) {
 	r := c.NewResponse(nil)
-	r.AddError(strconv.Itoa(iris.StatusNotFound),"page not found !" ,"we are looking for your page...but we can't find it")
+	r.AddError(strconv.Itoa(iris.StatusNotFound),"page not found !" ,"we are looking for your API...but we can't find it")
 	c.RenderJSON(ctx,r,iris.StatusNotFound)
 }
 

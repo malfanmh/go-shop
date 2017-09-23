@@ -42,7 +42,7 @@ func NewProduct(ctx context.Context) {
 		return
 	}
 
-	p := new(model.Products)
+	p := new(model.Product)
 	p.SetName(reqNewProduct.Name).
 		SetDescription(reqNewProduct.Description).
 		SetImgURL(reqNewProduct.ImgURL).
@@ -78,7 +78,7 @@ func UpdateProduct(ctx context.Context) {
 		return
 	}
 
-	p := new(model.Products)
+	p := new(model.Product)
 	p.SetID(id).
 		SetName(reqNewProduct.Name).
 		SetDescription(reqNewProduct.Description).

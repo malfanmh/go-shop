@@ -7,7 +7,7 @@ import (
 )
 
 type (
-	Products struct {
+	Product struct {
 		ID          int    			`db:"id"`
 		Name        string 			`db:"name"`
 		Description sql.NullString	`db:"description"`
@@ -24,11 +24,11 @@ type (
 	}
 )
 
-func FindProductByID(id string)(Products,error){
+func FindProductByID(id string)(Product,error){
 	return findProduct("id" , id)
 }
 
-func findProduct(field, value string) (Products, error){
+func findProduct(field, value string) (Product, error){
 	q := `
 		SELECT
 			id
@@ -52,16 +52,22 @@ func findProduct(field, value string) (Products, error){
 			status = ?
 	`
 
-	p := new(Products)
+	p := new(Product)
 	err := db.QueryRow(q,value, StatusCreated).Scan(&p.ID,&p.Name,&p.Description,&p.ImgURL,&p.Price,&p.Quantity,&p.CreatedAt,
 													&p.CreatedBy,&p.UpdatedAt,&p.UpdatedBy,&p.DeletedAt,&p.DeletedBy,&p.Status)
 	if	err != nil {
-		return Products{} , err
+		return Product{} , err
 	}
 	return *p, nil
 }
 
-func ListProduct(f *Filter)([]Products, bool , error){
+func ListProduct(f *Filter)([]Product, bool , error){
+	if f.Page < 1 {
+		f.Page = 1
+	}
+	if f.Count < 1 {
+		f.Count = 1
+	}
 	q := `
 		SELECT
 			id
@@ -85,22 +91,26 @@ func ListProduct(f *Filter)([]Products, bool , error){
 
 	`
 
-	var products []Products
+	var products []Product
 	rows , err := db.Query(q,  StatusCreated, f.Count+1, (f.Page-1)*f.Count)
 	if err != nil {
-		return []Products{} ,false, err
+		return []Product{} ,false, err
 
 	}
 
 	defer rows.Close()
 	for rows.Next() {
-		p := new(Products)
+		p := new(Product)
 		err := rows.Scan(&p.ID,&p.Name,&p.Description,&p.ImgURL,&p.Price,&p.Quantity,&p.CreatedAt,
 			&p.CreatedBy,&p.UpdatedAt,&p.UpdatedBy,&p.DeletedAt,&p.DeletedBy,&p.Status)
 		if err != nil {
-			return []Products{} ,false, err
+			return []Product{} ,false, err
 		}
 		products = append(products, *p)
+	}
+
+	if len(products) < 1  {
+		return []Product{} ,false, ErrResourceNotFound
 	}
 
 	next := false
@@ -114,7 +124,7 @@ func ListProduct(f *Filter)([]Products, bool , error){
 	return products,next, nil
 }
 
-func (p *Products) Insert() error{
+func (p *Product) Insert() error{
 	tx, err := db.Begin()
 	if err != nil {
 		return err
@@ -164,7 +174,7 @@ func (p *Products) Insert() error{
 	return nil
 }
 
-func (p *Products) Update() error {
+func (p *Product) Update() error {
 	tx, err := db.Begin()
 	if err != nil {
 		return  err
@@ -213,46 +223,46 @@ func (p *Products) Update() error {
 	return nil
 }
 
-func (p *Products) SetID(i int) *Products{
+func (p *Product) SetID(i int) *Product {
 	p.ID = i
 	return p
 }
 
-func (p *Products) SetName(s string) *Products{
+func (p *Product) SetName(s string) *Product {
 	p.Name = s
 	return p
 }
-func (p *Products) SetDescription(d string) *Products{
+func (p *Product) SetDescription(d string) *Product {
 	p.Description = sql.NullString{String:d,Valid:true}
 	return p
 }
-func (p *Products) SetImgURL(u string) *Products{
+func (p *Product) SetImgURL(u string) *Product {
 	p.ImgURL = sql.NullString{String:u,Valid:true}
 	return p
 }
 
-func (p *Products) SetPrice(f float64) *Products{
+func (p *Product) SetPrice(f float64) *Product {
 	p.Price = f
 	return p
 }
-func (p *Products) SetQuantity(q int) *Products{
+func (p *Product) SetQuantity(q int) *Product {
 	p.Quantity = q
 	return p
 }
-func (p *Products) SetUpdatedBy(s string) *Products{
+func (p *Product) SetUpdatedBy(s string) *Product {
 	p.UpdatedBy =  sql.NullString{String:s,Valid:true}
 	return p
 }
-func (p *Products) SetUpdatedAt(t time.Time) *Products{
+func (p *Product) SetUpdatedAt(t time.Time) *Product {
 	p.UpdatedAt =  mysql.NullTime{Time:t,Valid:true}
 	return p
 }
 
-func (p *Products) SetDeletedBy(s string) *Products{
+func (p *Product) SetDeletedBy(s string) *Product {
 	p.UpdatedBy =  sql.NullString{String:s,Valid:true}
 	return p
 }
-func (p *Products) SetDeletedAt(t time.Time) *Products{
+func (p *Product) SetDeletedAt(t time.Time) *Product {
 	p.UpdatedAt =  mysql.NullTime{Time:t,Valid:true}
 	return p
 }
