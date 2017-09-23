@@ -1,0 +1,5 @@
+server:
+  host: ":8000"
+
+database:
+  endpoint: "root@tcp(127.0.0.1:3306)/go_shop"
