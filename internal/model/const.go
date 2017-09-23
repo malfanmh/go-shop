@@ -6,6 +6,7 @@ import (
 
 var (
 	ErrResourceNotFound = errors.New("resource not found.")
+	ErrNotModified      = errors.New("data not modified.")
 )
 
 const (
