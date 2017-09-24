@@ -37,6 +37,9 @@ or you can direct output binary , for example :
 ```sh
 go build -o /usr/local/bin/go-shop
 ```
+----
+### api documentation
 
-
+* [Postman Collection](https://www.getpostman.com/collections/26aaf74af977dfb4c580)
+* [swagger](swagger.io) (comming soon)
 
