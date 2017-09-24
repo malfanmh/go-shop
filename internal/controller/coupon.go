@@ -7,6 +7,8 @@ import (
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/context"
 	"github.com/malfanmh/go-shop/internal/model"
+	"github.com/kataras/iris/core/errors"
+	"fmt"
 )
 
 type (
@@ -32,10 +34,10 @@ type (
 		Used		int			`json:"used,omitempty"`
 		CreatedAt   time.Time   `json:"created_at"`
 		CreatedBy   string      `json:"created_by"`
-		UpdatedAt   time.Time   `json:"created_at,omitempty"`
-		UpdatedBy   string      `json:"created_by,omitempty"`
-		DeletedAt   time.Time   `json:"created_at,omitempty"`
-		DeletedBy   string      `json:"created_by,omitempty"`
+		UpdatedAt   time.Time   `json:"updated_at,omitempty"`
+		UpdatedBy   string      `json:"updated_by,omitempty"`
+		DeletedAt   time.Time   `json:"deleted_at,omitempty"`
+		DeletedBy   string      `json:"deleted_by,omitempty"`
 		Status      string      `json:"status"`
 	}
 )
@@ -62,7 +64,7 @@ func NewCoupon(ctx context.Context) {
 	err := c.Insert()
 	if err != nil {
 		r.AddError(strconv.Itoa(iris.StatusInternalServerError), "Internal Server Error !", err.Error())
-		RenderJSON(ctx, r, iris.StatusBadRequest)
+		RenderJSON(ctx, r, iris.StatusInternalServerError)
 		return
 	}
 
@@ -103,7 +105,7 @@ func UpdateCoupon(ctx context.Context) {
 	err := c.Update()
 	if err != nil {
 		r.AddError(strconv.Itoa(iris.StatusInternalServerError), "Internal Server Error !", err.Error())
-		RenderJSON(ctx, r, iris.StatusBadRequest)
+		RenderJSON(ctx, r, iris.StatusInternalServerError)
 		return
 	}
 
@@ -122,8 +124,8 @@ func GetCouponByCode(ctx context.Context) {
 		RenderJSON(ctx, r, iris.StatusInternalServerError)
 		return
 	}
-	va , _ := time.Parse(time.RFC3339, coupon.ValidAt)
-	vu , _ := time.Parse(time.RFC3339Nano, coupon.ValidAt)
+	va , _ := time.Parse("2006-01-02 15:04:05", coupon.ValidAt)
+	vu , _ := time.Parse("2006-01-02 15:04:05", coupon.ValidUntil)
 
 	resCoupon := ResponseCoupon{
 		ID:          strconv.Itoa(coupon.ID),
@@ -164,7 +166,7 @@ func GetCoupon(ctx context.Context) {
 	rs := make([]ResponseCoupon, len(coupon))
 	for k, v := range coupon {
 		va , _ := time.Parse(time.RFC3339, v.ValidAt)
-		vu , _ := time.Parse(time.RFC3339Nano, v.ValidAt)
+		vu , _ := time.Parse(time.RFC3339Nano, v.ValidUntil)
 
 		rs[k].ID = strconv.Itoa(v.ID)
 		rs[k].Code = v.Code
@@ -199,4 +201,23 @@ func randStr(ln int, fm string) string {
 		result[i] = chars[rand.Intn(len(chars))]
 	}
 	return string(result)
+}
+
+func CheckCoupon(code string) (model.Coupon,error){
+	cp , err := model.FindCouponByCode(code)
+	if err != nil {
+		return model.Coupon{}, err
+	}
+	if cp.Quantity -1 < 1 {
+		return model.Coupon{}, errors.New("out of stock")
+	}
+
+	va , _ := time.Parse("2006-01-02 15:04:05", cp.ValidAt)
+	vu , _ := time.Parse("2006-01-02 15:04:05", cp.ValidUntil)
+	fmt.Println("periode",va,time.Now(),vu)
+	if !va.Before(time.Now()) || !vu.After(time.Now()) {
+		return model.Coupon{}, errors.New("out of date")
+	}
+
+	return cp ,nil
 }

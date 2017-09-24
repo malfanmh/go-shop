@@ -138,7 +138,6 @@ func ListCoupon(f *Filter)([]Coupon, bool , error){
 	return coupons,next, nil
 }
 
-
 func (c *Coupon) Insert() error{
 	tx, err := db.Begin()
 	if err != nil {
@@ -171,11 +170,6 @@ func (c *Coupon) Insert() error{
 	}
 	defer stmt.Close()
 
-	_, err = res.LastInsertId()
-	if err != nil {
-		return err
-	}
-
 	rowCnt, err := res.RowsAffected()
 	if err != nil {
 		return err
@@ -196,6 +190,7 @@ func (c *Coupon) Update() error{
 	if err != nil {
 		return err
 	}
+
 	q := `
 		UPDATE
 			coupons
@@ -220,11 +215,6 @@ func (c *Coupon) Update() error{
 		return err
 	}
 	defer stmt.Close()
-
-	_, err = res.LastInsertId()
-	if err != nil {
-		return err
-	}
 
 	rowCnt, err := res.RowsAffected()
 	if err != nil {

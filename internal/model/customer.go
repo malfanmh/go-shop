@@ -20,7 +20,7 @@ type (
 	}
 )
 
-func FindCustomerByID (id string)(Customers, error){
+func FindCustomerByID (id int)(Customers, error){
 	q := `
 		SELECT
 			id
@@ -34,7 +34,7 @@ func FindCustomerByID (id string)(Customers, error){
 			, deleted_by
 			, status
 		FROM
-			coupons
+			customers
 		WHERE
 			id = ?
 		AND
@@ -59,7 +59,7 @@ func (c *Customers) Insert() (int64 ,error){
 	}
 	q := `
 		INSERT INTO
-			coupons
+			customers
 				(
 					name
 					, phone
@@ -76,7 +76,7 @@ func (c *Customers) Insert() (int64 ,error){
 
 	res, err := stmt.Exec(c.Name, c.Phone,c.Email,c.Address)
 	if err != nil {
-		return nil,err
+		return 0,err
 	}
 	defer stmt.Close()
 
@@ -98,4 +98,21 @@ func (c *Customers) Insert() (int64 ,error){
 	}
 
 	return id ,nil
+}
+
+func (c *Customers) SetName(s string) *Customers {
+	c.Name = s
+	return c
+}
+func (c *Customers) SetPhone(s string) *Customers {
+	c.Phone = s
+	return c
+}
+func (c *Customers) SetEmail(s string) *Customers {
+	c.Email = s
+	return c
+}
+func (c *Customers) SetAddress(s string) *Customers {
+	c.Address = s
+	return c
 }

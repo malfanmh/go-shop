@@ -17,19 +17,19 @@ type (
 		Quantity    int    	  `json:"quantity"`
 	}
 	ResponseProduct struct {
-		ID          int           `json:"id"`
-		Name        string        `json:"name"`
-		Description string        `json:"description"`
-		ImgURL      string        `json:"img_url"`
-		Price       float64    	  `json:"price"`
-		Quantity    int           `json:"quantity"`
-		CreatedAt   time.Time   `json:"created_at"`
-		CreatedBy   string        `json:"created_by"`
-		UpdatedAt   time.Time   `json:"created_at,omitempty"`
-		UpdatedBy   string        `json:"created_by,omitempty"`
-		DeletedAt   time.Time   `json:"created_at,omitempty"`
-		DeletedBy   string        `json:"created_by,omitempty"`
-		Status      string        `json:"status"`
+		ID          int           	`json:"id"`
+		Name        string        	`json:"name"`
+		Description string        	`json:"description"`
+		ImgURL      string        	`json:"img_url"`
+		Price       float64    	  	`json:"price"`
+		Quantity    int           	`json:"quantity"`
+		CreatedAt   time.Time   	`json:"created_at"`
+		CreatedBy   string        	`json:"created_by"`
+		UpdatedAt   time.Time   	`json:"updated_at,omitempty"`
+		UpdatedBy   string        	`json:"updated_by,omitempty"`
+		DeletedAt   time.Time   	`json:"deleted_at,omitempty"`
+		DeletedBy   string        	`json:"deleted_by,omitempty"`
+		Status      string        	`json:"status"`
 	}
 )
 
@@ -61,11 +61,11 @@ func NewProduct(ctx context.Context) {
 }
 
 type RequestUpdateProduct struct {
-	Name        string    `json:"name"`
-	Description string    `json:"description"`
-	ImgURL      string    `json:"img_url"`
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
+	ImgURL      string  `json:"img_url"`
 	Price       float64 `json:"price"`
-	Quantity    int    `json:"quantity"`
+	Quantity    int    	`json:"quantity"`
 }
 
 func UpdateProduct(ctx context.Context) {
@@ -102,7 +102,6 @@ func UpdateProduct(ctx context.Context) {
 func GetProductByID(ctx context.Context) {
 	r := NewResponse(nil)
 	id := ctx.Params().Get("id")
-
 	product, err := model.FindProductByID(id)
 	if err != nil {
 		r.AddError(strconv.Itoa(iris.StatusInternalServerError), "Internal Server Error !", err.Error())

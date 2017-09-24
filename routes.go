@@ -31,9 +31,18 @@ func newApp() *iris.Application {
 
 	order := r.Party("/v1/api/order",)
 	{
-		order.Post("/",ping)
-		order.Get("/",ping)
-		order.Get("/{id}",ping)
+		order.Get("/",c.GetOrder)
+		order.Get("/{id}",c.GetOrderDetail)
+		order.Post("/cart",c.AddToCart)
+		order.Get("/paid",c.GetOrderListPending)
+		order.Put("/{id}/cart",c.UpdateCart)
+		order.Post("/{id}/coupon",c.AddCoupon)
+		order.Post("/{id}/payment",c.AddPaymentMethod)
+		order.Post("/{id}/payment/profile",c.UpdatePaymentProfile)
+		order.Post("/{id}/payment/proof",c.AddPaymentProofed)
+		order.Post("/{id}/shipped",c.UpdateShipped)
+		order.Post("/{id}/delivered",c.OrderSucceeded)
+		order.Post("/{id}/void",c.OrderVoided)
 	}
 
 	r.Get("/ping", ping)
